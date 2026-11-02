@@ -1,33 +1,61 @@
 import Link from "next/link";
-import { Aperture } from "lucide-react";
+import { Logo } from "@/components/landing/logo";
+
+const navLinks = [
+  { label: "Features", href: "#features" },
+  { label: "How it works", href: "#how-it-works" },
+  { label: "Pricing", href: "#pricing" },
+  { label: "FAQ", href: "#faq" },
+];
 
 export function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 backdrop-blur-md border border-zinc-700/60">
-            <Aperture className="h-5 w-5 text-white" />
-          </span>
-          <span className="text-[15px] font-semibold tracking-tight text-white">
-            PromptVision
-          </span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <Link
-            href="#features"
-            className="hidden text-sm text-zinc-400 transition-colors hover:text-white sm:block"
-          >
-            Features
-          </Link>
-          <Link
-            href="/studio"
-            className="rounded-xl border border-zinc-700/70 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:bg-zinc-800/60 hover:text-white"
-          >
-            Open Studio
-          </Link>
-        </div>
-      </nav>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <nav className="mt-3 flex h-14 items-center justify-between rounded-2xl border border-white/[0.06] bg-zinc-950/70 px-4 backdrop-blur-xl">
+          <Logo />
+
+          <div className="hidden items-center gap-1 md:flex">
+            {navLinks.map((link) => (
+              <Link
+                key={link.label}
+                href={link.href}
+                className="rounded-lg px-3 py-1.5 text-sm text-zinc-400 transition-colors hover:bg-white/5 hover:text-white"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              className="hidden rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-300 transition-colors hover:text-white sm:block"
+            >
+              Sign in
+            </Link>
+            <Link
+              href="/login"
+              className="group inline-flex h-9 items-center gap-1.5 rounded-lg bg-white px-4 text-sm font-semibold text-zinc-950 shadow-[0_0_20px_rgba(255,255,255,0.12)] transition-all hover:bg-zinc-200"
+            >
+              Start free
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+              >
+                <path
+                  d="M3 8h10m0 0L9 4m4 4-4 4"
+                  stroke="currentColor"
+                  strokeWidth="1.6"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
+          </div>
+        </nav>
+      </div>
     </header>
   );
 }

@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PromptVision — Look at the Lens. Read the Script. AI Handles the Rest.",
+  title: "GazePrompter — Look at the Lens. Read the Script. AI Handles the Rest.",
   description:
     "Browser-based AI video recording: real-time eye contact correction and voice-activated teleprompter. 100% client-side.",
 };

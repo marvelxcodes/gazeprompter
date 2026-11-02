@@ -13,7 +13,7 @@ import { useMediaRecording } from "@/hooks/use-media-recording";
 import { useEyeTracking } from "@/hooks/use-eye-tracking";
 import { DEFAULT_SCRIPT } from "@/lib/prompter-script";
 
-const SCRIPT_STORAGE_KEY = "promptvision:script";
+const SCRIPT_STORAGE_KEY = "gazeprompter:script";
 
 /**
  * The recording studio — orchestrates all four engines:
@@ -109,7 +109,7 @@ export function StudioClient() {
       <header className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="text-lg font-semibold tracking-tight text-white">
-            PromptVision <span className="text-zinc-500">Studio</span>
+            GazePrompter <span className="text-zinc-500">Studio</span>
           </span>
           <span className="hidden rounded-full border border-zinc-700/60 bg-white/5 px-3 py-1 text-xs text-zinc-300 sm:inline">
             {statusLabel}
