@@ -91,7 +91,7 @@ export function RecordingControls({
 
         {recordingUrl && (
           <>
-            <a href={recordingUrl} download="promptvision-take.webm">
+            <a href={recordingUrl} download="gazeprompter-take.webm">
               <Button variant="ghost" size="md">
                 <Download className="h-4 w-4" /> Download
               </Button>
