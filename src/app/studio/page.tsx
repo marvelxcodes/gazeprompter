@@ -3,9 +3,10 @@ import { StudioClient } from "@/components/studio/studio-client";
 
 export const metadata: Metadata = {
   title: "Studio · GazePrompter",
+  description:
+    "Record with a voice-tracked teleprompter and real-time eye contact correction.",
 };
 
-// Protected route (see src/middleware.ts) — always has a session here.
 export default function StudioPage() {
   return <StudioClient />;
 }

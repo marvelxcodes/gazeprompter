@@ -60,48 +60,64 @@ export function flattenWords(lines: PromptLine[]): IndexedWord[] {
 }
 
 /**
- * Word-sync: given the list of recognized words spoken so far (from the
- * speech recognizer), advance a pointer through the script using tolerant
- * subsequence matching.
- *
- * Strategy: walk the expected words; whenever the next spoken word matches
- * (or fuzzy-matches) the expected word, consume both. On mismatch we skip
- * ahead in the *spoken* stream (the speaker may have ad-libbed or the
- * recognizer misheard) but never regress in the script. Returns the index of
- * the furthest script line reached.
+ * Word-sync: map the stream of recognized words onto the script and report
+ * how far the speaker has advanced. Uses tolerant subsequence matching —
+ * exact hits first, then Levenshtein-based fuzzy hits (STT mis-hears words;
+ * speakers stutter, repeat and ad-lib). Never regresses the script pointer.
  */
-export function findCurrentLine(
+export function findCurrentWord(
   expected: IndexedWord[],
   spokenNormalized: string[]
 ): number {
-  if (expected.length === 0) return 0;
+  if (expected.length === 0 || spokenNormalized.length === 0) return 0;
   let e = 0; // pointer into expected words
   let s = 0; // pointer into spoken words
-  let lastLine = 0;
 
   while (e < expected.length && s < spokenNormalized.length) {
     const exp = expected[e].word;
     const spo = spokenNormalized[s];
 
     if (exp === spo || fuzzyMatch(exp, spo)) {
-      lastLine = expected[e].lineIndex;
       e++;
       s++;
     } else {
-      // Look ahead a few spoken words for a re-sync opportunity.
+      // Look ahead in the *spoken* stream for a re-sync opportunity…
       let resynced = false;
-      for (let la = 1; la <= 4 && s + la < spokenNormalized.length; la++) {
-        if (exp === spokenNormalized[s + la] || fuzzyMatch(exp, spokenNormalized[s + la])) {
+      for (let la = 1; la <= 6 && s + la < spokenNormalized.length; la++) {
+        const cand = spokenNormalized[s + la];
+        if (exp === cand || fuzzyMatch(exp, cand)) {
           s += la;
           resynced = true;
           break;
         }
       }
-      if (!resynced) s++; // treat current spoken word as noise/ad-lib
+      if (!resynced) {
+        // …otherwise look ahead in the *script* (speaker skipped lines).
+        for (let le = 1; le <= 6 && e + le < expected.length; le++) {
+          const cand = expected[e + le].word;
+          if (spo === cand || fuzzyMatch(cand, spo)) {
+            e += le;
+            e++;
+            s++;
+            resynced = true;
+            break;
+          }
+        }
+      }
+      if (!resynced) s++; // treat the spoken word as noise/ad-lib
     }
   }
 
-  return lastLine;
+  return Math.min(e, expected.length);
+}
+
+/** Convenience wrapper: furthest script *line* reached. */
+export function findCurrentLine(
+  expected: IndexedWord[],
+  spokenNormalized: string[]
+): number {
+  const w = findCurrentWord(expected, spokenNormalized);
+  return w > 0 ? expected[Math.min(w, expected.length) - 1].lineIndex : 0;
 }
 
 /** Levenshtein-light fuzzy match: allow small edits on longer words. */

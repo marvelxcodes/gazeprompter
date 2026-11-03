@@ -49,6 +49,8 @@ function getRecognitionCtor(): RecognitionCtor | null {
 export interface VoiceTrackingState {
   /** All finalized words heard so far, in order. */
   heardWords: string[];
+  /** In-flight (interim) words from the recognizer — for live scrolling. */
+  liveWords: string[];
   /** Latest interim transcript (for live UI feedback). */
   interimTranscript: string;
   listening: boolean;
@@ -69,6 +71,7 @@ export interface VoiceTrackingState {
  */
 export function useVoiceTracking(): VoiceTrackingState {
   const [heardWords, setHeardWords] = useState<string[]>([]);
+  const [liveWords, setLiveWords] = useState<string[]>([]);
   const [interimTranscript, setInterimTranscript] = useState("");
   const [listening, setListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +99,7 @@ export function useVoiceTracking(): VoiceTrackingState {
 
   const reset = useCallback(() => {
     setHeardWords([]);
+    setLiveWords([]);
     setInterimTranscript("");
   }, []);
 
@@ -143,6 +147,15 @@ export function useVoiceTracking(): VoiceTrackingState {
         }
       }
       setInterimTranscript(interim);
+      // Feed the live word stream (finals + in-flight interim words) to the
+      // teleprompter so scrolling reacts while the speaker is mid-sentence —
+      // this is what makes auto-scroll feel instant instead of chunky.
+      const interimWords = interim
+        .toLowerCase()
+        .split(/\s+/)
+        .map((w) => w.replace(/[^\p{L}\p{N}]/gu, ""))
+        .filter(Boolean);
+      setLiveWords(interimWords);
     };
 
     rec.onerror = (e) => {
@@ -201,6 +214,7 @@ export function useVoiceTracking(): VoiceTrackingState {
 
   return {
     heardWords,
+    liveWords,
     interimTranscript,
     listening,
     supported,
